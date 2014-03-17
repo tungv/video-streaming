@@ -11,10 +11,17 @@ exports.start = ->
   app.listen port
   logger.info "App started on port #{port} - mode: #{app.get 'env'}"
 
+  require './streamer.coffee'
+
 app.use express.static __dirname + '/../app'
-app.use '/video', express.static __dirname + '/../video'
 app.use express.json()
 
+
+
+
+###
+
+app.use '/video', express.static __dirname + '/../video'
 app.get '/video1/:file.:ext', (req, res)->
   {file, ext} = req.params
   path = req.path
@@ -57,4 +64,5 @@ app.get '/video1/:file.:ext', (req, res)->
     stream.destroy()
 
   logger.debug '\n\n'
+###
 
