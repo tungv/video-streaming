@@ -3,3 +3,6 @@ app:
 
 streamer:
   port: 9000
+
+ffmpeg:
+  maxthreads: 64

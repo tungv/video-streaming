@@ -3,6 +3,8 @@ config = require 'config'
 
 fs = require 'fs'
 
+ffmpeg = require 'fluent-ffmpeg'
+
 express = require 'express'
 app = express()
 
@@ -11,18 +13,26 @@ exports.start = ->
   app.listen port
   logger.info "App started on port #{port} - mode: #{app.get 'env'}"
 
-  require './streamer.coffee'
+  #require './streamer.coffee'
 
 app.use express.static __dirname + '/../app'
 app.use express.json()
 
+#app.get '/video/:filename', (req, res)->
+#  {filename} = req.params
+#  path = "#{__dirname}/../video/#{filename}"
+#  res.contentType 'video/webm'
+#  command = createCmd path, req.query
+#  ##command.writeToStream res,  {end:true}
+#
+#  command.saveToFile "#{__dirname}/../video/#{filename}_#{ req.query.start}"
 
 
 
-###
+
 
 app.use '/video', express.static __dirname + '/../video'
-app.get '/video1/:file.:ext', (req, res)->
+###app.get '/video1/:file.:ext', (req, res)->
   {file, ext} = req.params
   path = req.path
   path = __dirname+'/..' + path
@@ -66,3 +76,44 @@ app.get '/video1/:file.:ext', (req, res)->
   logger.debug '\n\n'
 ###
 
+
+createCmd = (fileName, {start, end}) ->
+  path = fileName
+  command = new ffmpeg { source: path, timeout: 0, logger }
+  #outputStream = fs.createWriteStream()
+
+  start = start or 0
+  end = end or start + 60
+  duration = end - start
+
+  logger.debug 'path', path
+  logger.debug 'start', start
+  logger.debug 'end', end
+  logger.debug 'duration', duration
+
+  return command
+  #.addOption('-threads', config['ffmpeg']['maxthreads'] || 4)
+  .setStartTime(0)
+  .setDuration(60)
+  .on("start", (commandLine) ->
+    console.log "Spawned FFmpeg with command: " + commandLine
+    return
+  ).on("codecData", (data) ->
+    console.log "Input is " + data.audio + " audio with " + data.video + " video"
+    return
+  ).on("progress", (progress) ->
+    console.log "Processing: " + progress.percent + "% done"
+    return
+  ).on("error", (err) ->
+    console.log "Cannot process video: " + err.message
+    logger.debug err
+    #cb err
+    return
+  ).on("end", ->
+    #cb null
+
+    # The 'end' event is emitted when FFmpeg finishes
+    # processing.
+    console.log "Processing finished successfully"
+    return
+  )

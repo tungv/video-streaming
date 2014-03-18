@@ -52,7 +52,7 @@ angular.module 'VideoApp'
 
     play = (video, cb)->
       start = 0
-      end = 300e6 #(first 30MB)
+      end = 120 #(first 2m)
 
       queue = [] ## clear queue
 
