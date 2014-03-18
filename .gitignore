@@ -13,5 +13,9 @@ results
 
 npm-debug.log
 node_modules
-.idea
-video
+.idea/
+video/
+
+app/scripts/*.js
+app/scripts/*.map
+config/runtime.json
