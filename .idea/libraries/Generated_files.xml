@@ -3,10 +3,12 @@
     <properties>
       <sourceFilesUrls>
         <item url="file://$PROJECT_DIR$/app/scripts/common.js" />
+        <item url="file://$PROJECT_DIR$/app/scripts/video-ajax.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
       <root url="file://$PROJECT_DIR$/app/scripts/common.js" />
+      <root url="file://$PROJECT_DIR$/app/scripts/video-ajax.js" />
     </CLASSES>
     <SOURCES />
   </library>

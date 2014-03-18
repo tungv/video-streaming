@@ -4,14 +4,15 @@ config = require 'config'
 fs = require 'fs'
 
 ffmpeg = require 'fluent-ffmpeg'
-
 express = require 'express'
 app = express()
 
 exports.start = ->
   port = config['app']['port']
-  app.listen port
+  http = app.listen port
   logger.info "App started on port #{port} - mode: #{app.get 'env'}"
+
+  #monitor.Monitor http
 
   #require './streamer.coffee'
 
@@ -27,44 +28,77 @@ app.use express.json()
 #
 #  command.saveToFile "#{__dirname}/../video/#{filename}_#{ req.query.start}"
 
+round = (n, digit=3) ->
+  co = 1
+  co = switch digit
+    when 1 then 10
+    when 2 then 100
+    when 3 then 1000
+    else  co *= 10 for i in [1..digit]
 
+  ~~(n * co) / co
 
+size = (bytes)->
+  if bytes < 1024 then return round(bytes) + 'B'
 
+  bytes /= 1024
+  if bytes < 1024 then return round(bytes) + 'KB'
+  bytes /= 1024
+  if bytes < 1024 then return round(bytes) + 'MB'
 
-app.use '/video', express.static __dirname + '/../video'
-###app.get '/video1/:file.:ext', (req, res)->
+counter = []
+
+#app.use '/video', express.static __dirname + '/../video'
+app.get '/video/:file.:ext', (req, res, next)->
   {file, ext} = req.params
   path = req.path
   path = __dirname+'/..' + path
+  id = req.query.id
 
-  logger.debug "path=#{path}"
-  logger.debug "fileName=#{file} - extension: #{ext}"
+  match = counter.filter (item)-> item.id
+  if match.length is 0
+    item = {id, size: 0}
+    counter.push item
+    #logger.debug 'counter', counter
+  else
+    item = match[0]
+
+  #logger.debug "path=#{path}"
+  #logger.debug "fileName=#{file} - extension: #{ext}"
 
   stats = fs.statSync path
   total = stats.size
 
   range = req.headers.range
+  return next() if !range
   positions = range.replace /bytes=/, ""
   positions = positions.split '-'
 
-  logger.debug 'positions', positions
+  #logger.debug 'positions', positions
 
   start = Number positions[0]
   end = if positions[1] then positions[1] else total-1
 
-  logger.debug 'end', end
+  #logger.debug 'end', end
   end = Number end
 
   chunksize = (end-start)+1;
+  maxChunkSize = 2 * 1024 * 1024
+  if chunksize > maxChunkSize then chunksize = maxChunkSize
+  end = start + chunksize - 1
 
-  logger.debug "total=#{total}\tstart=#{start} - end=#{end} / chunksize=#{chunksize}"
+  item.size += chunksize
+  logger.debug "#{start}-#{end}/#{total} SIZE=#{ size chunksize} (transfered=#{item.size})"
 
   res.writeHead 206, {
     "Content-Range": "bytes " + start + "-" + end + "/" + total
     "Accept-Ranges": "bytes"
     "Content-Length": chunksize
     "Content-Type":"video/mp4"
+    'ETag': [stats.size, stats.mtime, start, end].join '-'
+    #'Cache-Control':'max-age=600'
   }
+
 
   stream = fs.createReadStream(path, { flags: "r", start: start, end: end });
   stream.pipe res
@@ -72,9 +106,6 @@ app.use '/video', express.static __dirname + '/../video'
   res.on 'close', ->
     console.log 'closing stream'
     stream.destroy()
-
-  logger.debug '\n\n'
-###
 
 
 createCmd = (fileName, {start, end}) ->

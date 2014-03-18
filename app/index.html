@@ -8,16 +8,24 @@
 </head>
 <body>
 
-<video controls witdh="300" height="200">
-    <!--<source src="/video/highlights.mp4" type="video/mp4">-->
+<video controls witdh="300" height="200" preload='metadata'>
+    <source src="/video/highlights.mp4" type="video/mp4">
     <!--<source src="/video/kickass.avi" type="video/avi">-->
     <!--<source src="/video/mv.mp4" type="video/mp4">-->
-    <source src="/video/tao-quan.mp4" type="video/mp4">
+    <!--<source src="/video/tao-quan.mp4" type="video/mp4">-->
 </video>
 
-<button id="play" class="btn btn-default">
+<!--<button id="play" class="btn btn-default">
     play
-</button>
+</button>-->
+
+<div>
+    state = <span id="state"></span>
+    <br/>
+    current time = <span id="current-time"></span>
+    <br/>
+    buffered = <span id="buffered-0"></span>
+</div>
 
 <!--<script src="scripts/common.js"></script>-->
 <script src="bower_components/jquery/dist/jquery.js"></script>
