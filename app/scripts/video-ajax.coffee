@@ -23,28 +23,57 @@ round = (n, digit=3) ->
 getMeta = (eVideo) ->
   buffered = eVideo.buffered
   meta =
+    duration: eVideo.duration
     currentTime:eVideo.currentTime
     buffered: ({start: buffered.start(i), end: buffered.end(i)} for i in [0..buffered.length-1]) if buffered.length
     state: eVideo.readyState
 
   return meta
 
-render = (meta)->
-  $('#current-time').text round meta.currentTime
+calcPx = (position, duration)-> position / duration * 500
+
+render = ($process, meta)->
+  return unless meta.buffered
+
+  duration = meta.duration
+  ranges = $process.find('.buffered-ranges')
+  currentTime = $process.find('.current-time')
+
+  currentTime.css {width: calcPx meta.currentTime, duration}
+
+  meta.buffered.forEach ({start,end})->
+#    console.log start,end
+    div = $('<div/>').css({
+      position: 'absolute'
+      left: "#{calcPx start, duration}px"
+      width: "#{calcPx end - start + 1, duration}px"
+      height: '2px'
+      background: 'gray'
+    })
+
+    div.appendTo ranges
+
+  ###$('#current-time').text round meta.currentTime
   $('#buffered-0').text "#{round meta.buffered[0].start}-#{round meta.buffered[0].end}" if meta.buffered
   $('#state').text meta.state
   console.log "hit: #{meta.currentTime }" if round meta.currentTime is round meta.buffered?[0].end
-
+###
 
 $ ()->
   $video = $('video')
   eVideo = $video[0]
+  $process = $('.process[data-for=video-1]')
 
-  eVideo.src = eVideo.currentSrc + '?id=' + id
+  $process.on 'click', '.capture', (e) ->
+    x = e.pageX
+    y = e.pageY
+    $process.find('.tooltip').css {position: 'fixed', left: x}
+
+  #eVideo.src = eVideo.currentSrc + '?id=' + id
 
   eVideo.addEventListener 'progress', ()->
     meta = getMeta eVideo
-    console.log meta.currentTime, meta.buffered?[0].end
+    #console.log meta.currentTime, meta.buffered?[0].end
 
   events = ["abort", "canplay", "canplaythrough", "durationchange", "emptied", "ended", "error", "loadeddata", "loadedmetadata", "loadstart", "pause", "play", "playing", "progress", "ratechange", "seeked", "seeking", "stalled", "suspend", "timeupdate", "volumechange", "waiting"]
   ###events.forEach (event)->
@@ -67,8 +96,7 @@ $ ()->
     promise.fail (err)->
       console.error err###
 
-  intVal = setInterval ()->
+  $video.on 'timeupdate', ()->
     meta = getMeta eVideo
-    render meta
-  , 10
+    render $process, meta
 

@@ -49,6 +49,8 @@ size = (bytes)->
 counter = []
 
 #app.use '/video', express.static __dirname + '/../video'
+#return
+
 app.get '/video/:file.:ext', (req, res, next)->
   {file, ext} = req.params
   path = req.path
@@ -83,7 +85,7 @@ app.get '/video/:file.:ext', (req, res, next)->
   end = Number end
 
   chunksize = (end-start)+1;
-  maxChunkSize = 2 * 1024 * 1024
+  maxChunkSize = if start is 0 then 256*1024 else 2 * 1024 * 1024
   if chunksize > maxChunkSize then chunksize = maxChunkSize
   end = start + chunksize - 1
 

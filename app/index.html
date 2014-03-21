@@ -8,12 +8,23 @@
 </head>
 <body>
 
-<video controls witdh="300" height="200" preload='metadata'>
-    <source src="/video/highlights.mp4" type="video/mp4">
+<video id="video-1" controls witdh="300" height="200" preload='metadata'>
+    <!--<source src="/video/highlights.mp4" type="video/mp4">-->
     <!--<source src="/video/kickass.avi" type="video/avi">-->
-    <!--<source src="/video/mv.mp4" type="video/mp4">-->
+    <source src="/video/mv.mp4" type="video/mp4">
     <!--<source src="/video/tao-quan.mp4" type="video/mp4">-->
 </video>
+
+<div class="process" data-for="video-1"
+     style="background: black;height:2px;position: relative;width:500px">
+    <div class="current-time" style="background:red;height:2px;z-index:5"></div>
+    <div class="capture" style="z-index: 10;width: 100%;position:absolute;top:-10px;bottom:-10px">
+        <div class="tooltip">
+            here
+        </div>
+    </div>
+    <div class="buffered-ranges"></div>
+</div>
 
 <!--<button id="play" class="btn btn-default">
     play
