@@ -16,7 +16,8 @@
     "passport-http-bearer": "^1.0.1",
     "passport-local": "^0.1.6",
     "mongoose-unique-validator": "^0.3.0",
-    "binaryjs": "~0.2.1"
+    "binaryjs": "~0.2.1",
+    "cors": "~2.2.0"
   },
   "devDependencies": {},
   "scripts": {

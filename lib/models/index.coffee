@@ -41,13 +41,13 @@ models.user.findOne {email: 'test@tungv.com'}, (err, user)->
   ## insert admin to db
   admin.save()
 
-## init books for the first time
-models.book.count {}, (err, c)->
-  if err?
-    logger.fatal 'Cannot connect to mongo'
-    return
-
-  initBooks() if c is 0
+### init books for the first time
+#models.book.count {}, (err, c)->
+#  if err?
+#    logger.fatal 'Cannot connect to mongo'
+#    return
+#
+#  initBooks() if c is 0
 
 
 
