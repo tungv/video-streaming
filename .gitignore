@@ -16,6 +16,17 @@ node_modules
 .idea/
 video/
 
-app/scripts/*.js
-app/scripts/*.map
+app/bower_components
+app/scripts/**/*.js
+app/scripts/**/*.map
+
+lib/**/*.map
+lib/**/*.js
+
+test/**/*.map
+test/**/*.js
+
+
+
+
 config/runtime.json

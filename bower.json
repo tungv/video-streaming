@@ -1,0 +1,27 @@
+{
+  "name": "video-streaming",
+  "version": "0.0.0",
+  "homepage": "https://github.com/gmanvn/video-streaming",
+  "authors": [
+    "TungVV <tungvv2@fpt.com.vn>"
+  ],
+  "main": "/app/index.html",
+  "keywords": [
+    "video",
+    "streaming"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-route": "~1.2.14",
+    "jquery": "~2.1.0"
+  }
+}
