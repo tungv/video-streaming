@@ -1,0 +1,47 @@
+@blue: #369;
+@white: white;
+
+.navbar {
+  background: @blue;
+  color: @white
+}
+
+.book {
+  display: block;
+  float: left;
+  background: lighten(@blue, 20);
+  width: 200px;
+  height: 200px;
+  margin: 10px;
+  padding: 10px;
+  position: relative;
+  color: @white;
+
+  &:hover {
+    -webkit-transform: scale(1.05);
+
+    * {
+      color: @white
+    }
+  }
+
+  h5 {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    margin: 0;
+    height: 50px;
+    background: @blue;
+    overflow: hidden;
+
+    -webkit-transition: height .3s linear, overflow .1s linear .3s;
+
+    &:hover {
+      height: 200px;
+      overflow: visible;
+    }
+  }
+}

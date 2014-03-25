@@ -1,45 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Demo video streaming</title>
-    <style>
-
-    </style>
+    <title>BookStore.com</title>
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/styles/bookstore.css"/>
+    <script>
+        // for easy configuration
+        window.api_host = 'http://api.test.com:3000'
+    </script>
 </head>
-<body>
+<body ng-app="BookStore">
+    <ng-include src="'/partials/navbar.html'"></ng-include>
 
-<video id="video-1" controls witdh="300" height="200" preload='metadata'>
-    <!--<source src="/video/highlights.mp4" type="video/mp4">-->
-    <!--<source src="/video/kickass.avi" type="video/avi">-->
-    <source src="/video/mv.mp4" type="video/mp4">
-    <!--<source src="/video/tao-quan.mp4" type="video/mp4">-->
-</video>
-
-<div class="process" data-for="video-1"
-     style="background: black;height:2px;position: relative;width:500px">
-    <div class="current-time" style="background:red;height:2px;z-index:5"></div>
-    <div class="capture" style="z-index: 10;width: 100%;position:absolute;top:-10px;bottom:-10px">
-        <div class="tooltip">
-            here
-        </div>
+    <div class="container">
+        <div ng-view></div>
     </div>
-    <div class="buffered-ranges"></div>
-</div>
 
-<!--<button id="play" class="btn btn-default">
-    play
-</button>-->
+    <!--library-->
+    <script src="/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="/bower_components/angular/angular.js"></script>
+    <script src="/bower_components/angular-resource/angular-resource.js"></script>
+    <script src="/bower_components/angular-route/angular-route.js"></script>
+    <script src="/bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="/bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="/bower_components/JavaScript-MD5/js/md5.min.js"></script>
+    <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!--end library-->
 
-<div>
-    state = <span id="state"></span>
-    <br/>
-    current time = <span id="current-time"></span>
-    <br/>
-    buffered = <span id="buffered-0"></span>
-</div>
+    <!-- app scripts: can be easily concat and inject with grunt -->
+    <script src="/scripts/app.js"></script>
 
-<!--<script src="scripts/common.js"></script>-->
-<script src="bower_components/jquery/dist/jquery.js"></script>
-<script src="scripts/video-ajax.js"></script>
+    <script src="/scripts/services/auth.js"></script>
+    <script src="/scripts/services/books.js"></script>
+    <script src="/scripts/services/users.js"></script>
+    <script src="/scripts/services/pagination.js"></script>
+
+    <script src="/scripts/directives/autofillEnabledDirective.js"></script>
+    <script src="/scripts/directives/mongooseErrorDirective.js"></script>
+    <script src="/scripts/directives/inputMatchDirective.js"></script>
+
+    <script src="/scripts/controllers/navigationController.js"></script>
+    <script src="/scripts/controllers/homeController.js"></script>
+    <script src="/scripts/controllers/loginController.js"></script>
+    <script src="/scripts/controllers/signupController.js"></script>
+    <script src="/scripts/controllers/bookIndexController.js"></script>
+    <script src="/scripts/controllers/bookDetailController.js"></script>
+    <!-- end app scripts -->
+
 </body>
 </html>

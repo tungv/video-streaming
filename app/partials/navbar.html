@@ -1,0 +1,21 @@
+<div class="row">
+    <div class="col-md-6">
+        <a href="/">BookStore</a>
+    </div>
+    <div class="col-md-6">
+        <div class="user pull-right" ng-show="user.email" ng-controller="NavigationCtrl as nav">
+            welcome, {{ user.displayName }} [
+            <a href="#" ng-click="nav.logout()">
+                logout
+            </a>
+            ]
+        </div>
+
+        <div class="no-user pull-right" ng-hide="user.email">
+            Welcome Guest, please
+            <a href="/login">log in</a> or <a href="/signup">Sign up</a>
+        </div>
+    </div>
+
+</div>
+

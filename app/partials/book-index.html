@@ -1,0 +1,60 @@
+<h1>Books:</h1>
+<div class="row">
+    <div class="col-md-8">
+        <div class="row">
+            <!--{{ index.books.$paging }}-->
+            <span class="col-md-4">
+                Showing: {{ index.books.$paging.from }} - {{ index.books.$paging.to }} of {{ index.books.$paging.total }} books
+            </span>
+            <div class="col-md-7 col-md-offset-1">
+                <ul class="pagination pagination-sm" style="margin:0">
+
+                    <li ng-class="{disabled: !index.books.$paging.previous.limit}">
+                        <a href="#" ng-click="index.update(index.books.$paging.previous)">&laquo;</a>
+                    </li>
+
+                    <li ng-repeat="p in index.books.$paging.visiblePages"
+                        ng-class="{active: p.current}">
+                        <a href="#" ng-click="index.update(p)">{{ p.page }}</a>
+                    </li>
+                    <li ng-class="{disabled: !index.books.$paging.next.limit}">
+                        <a href="#" ng-click="index.update(index.books.$paging.next)">&raquo;</a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-4">
+        <form>
+            <div class="input-group">
+                <input type="search" class="form-control" name="book-search" ng-model="index.query"/><span class="input-group-btn">
+                <button class="btn btn-primary" ng-click="index.update({limit: 12})">
+                    Search
+                </button>
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="btn-group">
+        <button type="button" class="btn btn-default" ng-click="index.sort='price';index.update()">Lowest price first</button>
+        <button type="button" class="btn btn-default" ng-click="index.sort='-price';index.update()">Highest price first</button>
+    </div>
+</div>
+
+
+<div class="book-list clearfix">
+    <a ng-repeat="book in index.books track by book.id"
+         class="book"
+         id="book-id-{{book.id}}"
+         ng-href="/books/{{book.id}}">
+
+        <img ng-src="{{book.picture}}" alt="{{book.desc}}"/>
+        <h5>{{book.name}}</h5>
+        <!--<p>{{book.desc}}</p>-->
+        <ins>${{book.price | number}}</ins>
+
+    </a>
+</div>

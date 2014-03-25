@@ -1,33 +1,41 @@
 {
-  "name": "video-streaming",
-  "version": "0.0.0",
-  "description": "video-streaming ===============",
+  "name": "demo-bookstore",
+  "version": "0.0.1",
+  "description": "Demo bookstore eCom api",
   "main": "server.coffee",
   "dependencies": {
     "config": "~0.4.35",
     "express": "~3.4.8",
+    "js-yaml": "~3.0.2",
     "lodash": "~2.4.1",
     "log4js": "~0.6.12",
-    "yaml": "~0.2.3",
-    "fluent-ffmpeg": "^1.6.0",
-    "brake": "^0.1.0",
-    "monitor": "^0.6.8",
-    "monitor-dashboard": "^0.6.7"
+    "passport": "~0.2.0",
+    "mongoose": "^3.8.8",
+    "baucis": "^0.15.1",
+    "require-all": "0.0.8",
+    "passport-http-bearer": "^1.0.1",
+    "passport-local": "^0.1.6",
+    "mongoose-unique-validator": "^0.3.0"
   },
-  "devDependencies": {
-    "mocha": "latest"
-  },
+  "devDependencies": {},
   "scripts": {
-    "test": "mocha"
+    "test": "sh run_tests.sh"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gmanvn/video-streaming.git"
+    "url": "https://github.com/gmanvn/demo-bookstore.git"
   },
+  "keywords": [
+    "ecom",
+    "demo",
+    "api",
+    "coffee-script",
+    "passport"
+  ],
   "author": "me@tungv.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gmanvn/video-streaming/issues"
+    "url": "https://github.com/gmanvn/demo-bookstore/issues"
   },
-  "homepage": "https://github.com/gmanvn/video-streaming"
+  "homepage": "https://github.com/gmanvn/demo-bookstore"
 }

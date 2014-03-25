@@ -1,0 +1,56 @@
+<form name="signupForm" ng-submit="signup.submit(signupForm)">
+    <div class="form-group">
+        <label for="displayName">
+            Name:
+        </label>
+        <input type="text" class="form-control"
+               name="displayName" id="displayName"
+               ng-model="signup.displayName"
+               autofill-enabled
+               required/>
+    </div>
+
+    <div class="form-group">
+        <label for="email">
+            Email:
+        </label>
+        <input type="email" class="form-control"
+               name="email" id="email"
+               ng-model="signup.email"
+               autofill-enabled
+               mongoose-error
+               required/>
+        <p class="help-block" ng-show="signupForm.email.$error.mongoose">
+            this email is taken
+        </p>
+    </div>
+
+    <div class="form-group">
+        <label for="password">
+            Password:
+        </label>
+        <input type="password" class="form-control"
+               name="password" id="password"
+               ng-model="signup.password"
+               autofill-enabled
+               required/>
+    </div>
+
+    <div class="form-group">
+        <label for="retype_password">
+            Retype:
+        </label>
+        <input type="password" class="form-control"
+               name="retype_password" id="retype_password"
+               input-match="signup.password"
+               ng-model="signup.retype_password"
+               autofill-enabled
+               required/>
+        <p class="help-block" ng-show="signupForm.retype_password.$error.match">
+            password doesn't match
+        </p>
+    </div>
+    <button class="btn btn-primary">
+        Signup
+    </button>
+</form>

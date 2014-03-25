@@ -1,0 +1,67 @@
+{{ book.book | json }}
+<div class="row">
+    <div class="col-md-4">
+        <a class="book"
+           id="book-id-{{detail.book.id}}"
+           ng-href="/books/{{detail.book.id}}">
+
+            <img ng-src="{{detail.book.picture}}" alt="{{detail.book.desc}}"/>
+            <h5>
+                <strong>{{detail.book.name}}</strong>
+                <br/>
+                <em>{{detail.book.desc}}</em>
+            </h5>
+
+            <ins>${{detail.book.price | number}}</ins>
+
+        </a>
+    </div>
+    <div class="col-md-8">
+        <form name="formUpdate" ng-submit="detail.update(formUpdate)">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" name="name" id="name"
+                       class="form-control"
+                       ng-model="detail.book.name"
+                       required/>
+            </div>
+
+            <div class="form-group">
+                <label for="desc">Description:</label>
+                <textarea name="desc" id="desc" rows="6"
+                          class="form-control"
+                          ng-model="detail.book.desc"
+                          required>
+                </textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="price">Price:</label>
+                <input type="number" name="price" id="price"
+                       class="form-control"
+                       ng-model="detail.book.price"
+                       required/>
+            </div>
+
+            <div class="form-group">
+                <label for="picture">Picture:</label>
+                <input type="url" name="picture" id="picture" class="form-control"
+                       ng-model="detail.book.picture"
+                       required/>
+            </div>
+
+            <div class="form-group">
+                <button class="btn btn-primary" type="submit">
+                    Save
+                </button>
+                <button class="btn btn-danger" ng-click="detail.remove()">
+                    Delete
+                </button>
+                <a class="btn btn-default" href="/books">
+                    Back
+                </a>
+
+            </div>
+        </form>
+    </div>
+</div>

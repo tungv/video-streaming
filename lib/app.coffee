@@ -1,152 +1,115 @@
-logger = require('log4js').getLogger('app')
 config = require 'config'
+log4js = require 'log4js'
+logger = log4js.getLogger 'app.coffee'
 
-fs = require 'fs'
-
-ffmpeg = require 'fluent-ffmpeg'
+## libraries
 express = require 'express'
+fs = require 'fs'
+baucis = require 'baucis'
+_ = require 'lodash'
+cors = require 'cors'
+
+## cache index file
+## TODO: use req.render
+
+indexPath = __dirname+'/../app/index.html'
+index = String fs.readFileSync indexPath
+fs.watchFile indexPath, ->
+  index = String fs.readFileSync indexPath
+  logger.debug 'index changed'
+
+
+## init app
 app = express()
+app.set 'port', config['app']['port'] or 3000
 
-exports.start = ->
-  port = config['app']['port']
-  http = app.listen port
-  logger.info "App started on port #{port} - mode: #{app.get 'env'}"
-
-  #monitor.Monitor http
-
-  #require './streamer.coffee'
-
-app.use express.static __dirname + '/../app'
+## basic middlewares
 app.use express.json()
+app.use express.urlencoded()
+app.use express.compress()
+app.use express.methodOverride()
+app.use express.static __dirname + '/../app'
 
-#app.get '/video/:filename', (req, res)->
-#  {filename} = req.params
-#  path = "#{__dirname}/../video/#{filename}"
-#  res.contentType 'video/webm'
-#  command = createCmd path, req.query
-#  ##command.writeToStream res,  {end:true}
-#
-#  command.saveToFile "#{__dirname}/../video/#{filename}_#{ req.query.start}"
+## init authentication
+passport = require './authentication.coffee'
 
-round = (n, digit=3) ->
-  co = 1
-  co = switch digit
-    when 1 then 10
-    when 2 then 100
-    when 3 then 1000
-    else  co *= 10 for i in [1..digit]
+## support cors
+#app.options '/api/*', cors(origin:true)
+app.use '/api', cors {
+  origin:true
+  allowedHeaders: 'Content-Type,X-AUTH-TOKEN,X-AUTH-USERNAME,X-AUTH-HASHED'
+  exposedHeaders: 'Link,Vary,API-Version,ETag'
+}
 
-  ~~(n * co) / co
-
-size = (bytes)->
-  if bytes < 1024 then return round(bytes) + 'B'
-
-  bytes /= 1024
-  if bytes < 1024 then return round(bytes) + 'KB'
-  bytes /= 1024
-  if bytes < 1024 then return round(bytes) + 'MB'
-
-counter = []
-
-#app.use '/video', express.static __dirname + '/../video'
-#return
-
-app.get '/video/:file.:ext', (req, res, next)->
-  {file, ext} = req.params
-  path = req.path
-  path = __dirname+'/..' + path
-  id = req.query.id
-
-  match = counter.filter (item)-> item.id
-  if match.length is 0
-    item = {id, size: 0}
-    counter.push item
-    #logger.debug 'counter', counter
-  else
-    item = match[0]
-
-  #logger.debug "path=#{path}"
-  #logger.debug "fileName=#{file} - extension: #{ext}"
-
-  stats = fs.statSync path
-  total = stats.size
-
-  range = req.headers.range
-  return next() if !range
-  positions = range.replace /bytes=/, ""
-  positions = positions.split '-'
-
-  #logger.debug 'positions', positions
-
-  start = Number positions[0]
-  end = if positions[1] then positions[1] else total-1
-
-  #logger.debug 'end', end
-  end = Number end
-
-  chunksize = (end-start)+1;
-  maxChunkSize = if start is 0 then 256*1024 else 2 * 1024 * 1024
-  if chunksize > maxChunkSize then chunksize = maxChunkSize
-  end = start + chunksize - 1
-
-  item.size += chunksize
-  logger.debug "#{start}-#{end}/#{total} SIZE=#{ size chunksize} (transfered=#{item.size})"
-
-  res.writeHead 206, {
-    "Content-Range": "bytes " + start + "-" + end + "/" + total
-    "Accept-Ranges": "bytes"
-    "Content-Length": chunksize
-    "Content-Type":"video/mp4"
-    'ETag': [stats.size, stats.mtime, start, end].join '-'
-    #'Cache-Control':'max-age=600'
-  }
+## custom middlewares
+middlewares = require './middlewares.coffee'
+app.use '/api', middlewares.ensureAuthCriteria
+app.use '/api', middlewares.authenticate(passport)
 
 
-  stream = fs.createReadStream(path, { flags: "r", start: start, end: end });
-  stream.pipe res
+## passport middlewares
+app.use passport.initialize()
+app.use passport.session()
 
-  res.on 'close', ->
-    console.log 'closing stream'
-    stream.destroy()
+bookCtrl = baucis.rest {
+  model: 'book'
+  relations: true
+  findBy: 'id'
+  #select: '-_id -__v'
+}
+userCtrl = baucis.rest {
+  model: 'user'
+  select: '-salt -hashedPassword'
+  relations: true
+}
+
+try
+  logger.info 'Try to fix mquery issue'
+  mongoose = require('mongoose')
+  denied = mongoose.__proto__.mquery.permissions.count
+  delete denied.sort
+catch ex
+  logger.fatal 'Cannot fix count with sort issue from mquery'
+
+## enable search
+bookCtrl.request 'collection', 'get', middlewares.baucisSearch ['name', 'desc']
 
 
-createCmd = (fileName, {start, end}) ->
-  path = fileName
-  command = new ffmpeg { source: path, timeout: 0, logger }
-  #outputStream = fs.createWriteStream()
+## restful api routes
+app.use '/api', baucis()
+app.use '/api', (err, req, res, next)->
+  ## error handler
+  logger.warn err.stack
+  next err
 
-  start = start or 0
-  end = end or start + 60
-  duration = end - start
+## custom api routes
+app.post '/api/login', (req, res)->
+  auth = passport.authenticate 'local', (err ,user ,info)->
+    if err
+      res.json err
+    else if user
+      res.json user.userInfo
+    else
+      res.json error:info
 
-  logger.debug 'path', path
-  logger.debug 'start', start
-  logger.debug 'end', end
-  logger.debug 'duration', duration
+  auth req, res
 
-  return command
-  #.addOption('-threads', config['ffmpeg']['maxthreads'] || 4)
-  .setStartTime(0)
-  .setDuration(60)
-  .on("start", (commandLine) ->
-    console.log "Spawned FFmpeg with command: " + commandLine
-    return
-  ).on("codecData", (data) ->
-    console.log "Input is " + data.audio + " audio with " + data.video + " video"
-    return
-  ).on("progress", (progress) ->
-    console.log "Processing: " + progress.percent + "% done"
-    return
-  ).on("error", (err) ->
-    console.log "Cannot process video: " + err.message
-    logger.debug err
-    #cb err
-    return
-  ).on("end", ->
-    #cb null
+app.post '/api/logout', (req, res)->
+  req.logOut()
+  res.send(204)
 
-    # The 'end' event is emitted when FFmpeg finishes
-    # processing.
-    console.log "Processing finished successfully"
-    return
-  )
+app.get '/', (req, res)->
+  res.send 200, index
+
+app.get '/*', (req, res)->
+  res.send 200, index
+
+
+exports.start = (cb)->
+  port = app.get 'port'
+  env = app.get 'env'
+  app.listen port
+  logger.info "Application start listening on port #{port} - mode: #{env}"
+
+
+
