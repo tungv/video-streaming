@@ -6,3 +6,9 @@ mongo:
   port: 27017
   db: BookStore
 
+
+streamer:
+  port: 9000
+
+ffmpeg:
+  maxthreads: 64
